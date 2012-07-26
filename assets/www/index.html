@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Cordova</title>
+		<link rel="stylesheet"  href="css/jquery.mobile-1.0.1.css" />
+		<script src="js/libs/jquery.js"></script>
+		<script src="js/libs/jquery.mobile-1.0.1.min.js"></script>
+		<script type="text/javascript" charset="utf-8" src="js/libs/cordova-1.9.0.js"></script>
+		<script type="text/javascript" charset="utf-8">
+
+		// Wait for Cordova to load
+	    //
+	    document.addEventListener("deviceready", onDeviceReady, false);
+
+	    var watchID = null;
+
+	    // Cordova is ready
+	    //
+	    function onDeviceReady() {
+	        // Get the most accurate position updates available on the
+	        // device.
+	        var options = { enableHighAccuracy: true };
+	        watchID = navigator.geolocation.watchPosition(onSuccess, onError, options);
+	    }
+
+	    // onSuccess Geolocation
+	    //
+	    function onSuccess(position) {
+	        var element = document.getElementById('geolocation');
+	        element.innerHTML = 'Latitude: '  + position.coords.latitude      + '<br />' +
+	                            'Longitude: ' + position.coords.longitude     + '<br />' +
+	                            '<hr />'      + element.innerHTML;
+	    }
+
+	    // clear the watch that was started earlier
+	    // 
+	    function clearWatch() {
+	        if (watchID != null) {
+	            navigator.geolocation.clearWatch(watchID);
+	            watchID = null;
+	        }
+	    }
+
+	    // onError Callback receives a PositionError object
+	    //
+	    function onError(error) {
+	      alert('code: '    + error.code    + '\n' +
+	            'message: ' + error.message + '\n');
+	    }
+	
+	    </script>
+	</head>
+	<body>
+		<div data-role="page" class="type-home">
+			<div data-role="header" data-theme="f">
+				<h1>Geo-location</h1>
+				<a href="#" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-home">Home</a>
+			</div>
+			<div data-role="content">
+				<p id="geolocation">Watching geolocation...</p>
+    			<button onclick="clearWatch();">Clear Watch</button>
+			</div>
+		</div>
+	</body>
+</html>
