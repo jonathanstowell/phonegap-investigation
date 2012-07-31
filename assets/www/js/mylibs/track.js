@@ -12,10 +12,15 @@ var tracking_model = {};
 	index.latitude = ko.observable();
 	index.longitude = ko.observable();
 	index.map = null;
+	index.errors = ko.observableArray([]);
 	
 	index.currentTrackingData = ko.observableArray([]);
 	
 	index.startTracking = function() {
+		
+		if(index.validate() == false)
+			return;
+		
 		index.isTracking(true);
 		index.startDateTime(new Date());
 		
@@ -28,7 +33,7 @@ var tracking_model = {};
 			var pos = new google.maps.LatLng(index.latitude(), index.longitude());
 			
 			if (index.map == null)
-				index.map = new google.maps.Map(jQuery("#track-map-canvas")[0], { zoom: 10, center: pos, mapTypeId: google.maps.MapTypeId.ROADMAP });
+				index.map = new google.maps.Map(jQuery("#track-map-canvas")[0], { zoom: 15, center: pos, mapTypeId: google.maps.MapTypeId.ROADMAP });
 			else
 				index.map.setCenter(pos);
 			
@@ -57,7 +62,7 @@ var tracking_model = {};
 		index.isTracking(false);
 		index.endDateTime(new Date());
 		
-		workout_repository.save(index.name(), { name: index.name(), trackingData: index.currentTrackingData(), startDateTime: index.startDateTime(), endDateTime: index.endDateTime() });
+		workout_repository.save(index.name(), { name: index.name(), trackingData: index.currentTrackingData(), startDateTime: index.startDateTime(), endDateTime: index.endDateTime(), distance: index.distance() });
 		
 		index.clear();
 	};
@@ -75,6 +80,27 @@ var tracking_model = {};
 		}
 		
 		return total_km.toFixed(2);
+	});
+	
+	index.validate = function() {
+		index.errors.removeAll();
+		
+		if (!index.name()) {
+			index.errors.push({ value: "Name is required." })
+		}
+		
+		if (workout_repository.isUniqueName(index.name()) == false) {
+			index.errors.push({ value: "Name must be unique." })
+		}
+		
+		if (index.errors().length > 0)
+			return false;
+			
+		return true;
+	}
+	
+	jQuery('#tracking').live('pageshow', function () {
+		index.errors.removeAll();
 	});
 	
 	index.clear = function(){

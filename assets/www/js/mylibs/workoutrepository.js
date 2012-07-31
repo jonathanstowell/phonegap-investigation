@@ -20,15 +20,14 @@ var workout_repository = {};
 		var total_km = 0;
 		
 		for(i = 0; i < all.length; i++){
-		    
-		    if(i == (all.length - 1)){
-		        break;
-		    }
-		    
-		    total_km += gps_distance(all[i].coords.latitude, all[i].coords.longitude, all[i+1].coords.latitude, all[i+1].coords.longitude);
+			total_km += all[i].distance;
 		}
 		
-		return total_km.toFixed(2);
+		return total_km;
+	}
+	
+	index.isUniqueName = function(key) {
+		return window.localStorage.getItem(key) === null;
 	}
 	
 	index.getByKey = function(key) {
@@ -43,7 +42,7 @@ var workout_repository = {};
 		window.localStorage.setItem(key, ko.toJSON(item));
 	}
 	
-	index.delete = function(key) {
+	index.deleteItem = function(key) {
 		window.localStorage.removeItem(key);
 	}
 	

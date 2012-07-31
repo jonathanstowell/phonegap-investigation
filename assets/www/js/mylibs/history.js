@@ -16,7 +16,7 @@ var history_model = {};
 		var items = workout_repository.getAll();
 		
 		for(i=0; i < items.length; i++){
-			index.tracks.push(items[0]);
+			index.tracks.push(items[i]);
 		}
 		
 		jQuery("#history-tracklist").listview('refresh');

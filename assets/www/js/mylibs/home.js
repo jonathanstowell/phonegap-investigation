@@ -9,6 +9,7 @@ var home_model = {};
 	
 	jQuery('#home').live('pageshow', function () {
 		index.rideCount(workout_repository.count());
+		index.distanceCount(workout_repository.totalDistance());
 	});
 	
 	jQuery(function(){
