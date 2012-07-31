@@ -7,6 +7,8 @@ var tracking_model = {};
 	index.name = ko.observable();
 	index.watch = null;
 	index.isTracking = ko.observable(false);
+	index.startDateTime = ko.observable();
+	index.endDateTime = ko.observable();
 	index.latitude = ko.observable();
 	index.longitude = ko.observable();
 	index.map = null;
@@ -15,17 +17,36 @@ var tracking_model = {};
 	
 	index.startTracking = function() {
 		index.isTracking(true);
+		index.startDateTime(new Date());
 		
 		index.watch = navigator.geolocation.watchPosition(function(position) {
 			index.latitude(position.coords.latitude);
 			index.longitude(position.coords.longitude);
 			
-			if (index.map == null)
-				index.map = new google.maps.Map(document.getElementById("map-canvas"), { zoom: 5, center: new google.maps.LatLng(index.latitude(), index.longitude()), mapTypeId: google.maps.MapTypeId.ROADMAP });
-			else
-				index.map.panTo(new google.maps.LatLng(index.latitude(), index.longitude()));
-			
 			index.currentTrackingData.push(position);
+			
+			var pos = new google.maps.LatLng(index.latitude(), index.longitude());
+			
+			if (index.map == null)
+				index.map = new google.maps.Map(jQuery("#track-map-canvas")[0], { zoom: 10, center: pos, mapTypeId: google.maps.MapTypeId.ROADMAP });
+			else
+				index.map.setCenter(pos);
+			
+			var trackCoords = [];
+
+		    for(i=0; i < index.currentTrackingData().length; i++){
+		    	trackCoords.push(new google.maps.LatLng(index.currentTrackingData()[i].coords.latitude, index.currentTrackingData()[i].coords.longitude));
+		    }
+		    
+		    var trackPath = new google.maps.Polyline({
+		      path: trackCoords,
+		      strokeColor: "#FF0000",
+		      strokeOpacity: 1.0,
+		      strokeWeight: 2
+		    });
+
+		    trackPath.setMap(index.map);
+		    
 		}, function(error) {
 			console.log(error);
 		}, 
@@ -34,9 +55,11 @@ var tracking_model = {};
 	
 	index.stopTracking = function() {
 		index.isTracking(false);
-		navigator.geolocation.clearWatch(index.watch);
-		index.map = null;
-		window.localStorage.setItem(index.name(), ko.toJSON(index.currentTrackingData));
+		index.endDateTime(new Date());
+		
+		workout_repository.save(index.name(), { name: index.name(), trackingData: index.currentTrackingData(), startDateTime: index.startDateTime(), endDateTime: index.endDateTime() });
+		
+		index.clear();
 	};
 	
 	index.distance = ko.computed(function(){
@@ -53,6 +76,19 @@ var tracking_model = {};
 		
 		return total_km.toFixed(2);
 	});
+	
+	index.clear = function(){
+		if (index.watch != null) {
+			navigator.geolocation.clearWatch(index.watch);
+		}
+		
+		index.map = null;
+		index.name("");
+		index.latitude("");
+		index.longitude("");
+		index.startDateTime("");
+		index.endDateTime("");
+	};
 	
 	jQuery(function(){
 		ko.applyBindings(index, jQuery("#tracking")[0]);

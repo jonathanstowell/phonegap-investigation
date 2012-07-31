@@ -9,13 +9,15 @@
 		<script src="js/libs/knockout-2.1.0.js"></script>
 		<script src="js/libs/cordova-2.0.0.js"></script>
 		
-		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=yourkeyhere&sensor=false"></script>
+		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAskqcGMbFzNWWwwc45An3IP7xU_6zm5SM&sensor=false"></script>
 		
 		<script src="js/mylibs/utils.js"></script>
+		<script src="js/mylibs/workoutrepository.js"></script>
 		<script src="js/mylibs/home.js"></script>
 		<script src="js/mylibs/track.js"></script>
 		<script src="js/mylibs/history.js"></script>
 		<script src="js/mylibs/trackinfo.js"></script>
+		<script src="js/mylibs/settings.js"></script>
 	</head>
 	<body>
 		<!-- Start of Home page -->
@@ -30,6 +32,7 @@
 						<li><a href="#home" data-transition="slide" data-icon="home" data-theme="b">Home</a></li>
 						<li><a href="#tracking" data-transition="slide" data-icon="plus">Track Workout</a></li>
 						<li><a href="#history" data-transition="slide" data-icon="star">History</a></li>
+						<li><a href="#settings" data-transition="slide" data-icon="star">Settings</a></li>
 					</ul>
 				</div>
 			</div>
@@ -50,6 +53,7 @@
 						<li><a href="#home" data-transition="slide" data-icon="home">Home</a></li>
 						<li><a href="#tracking" data-transition="slide" data-icon="plus" data-theme="b">Track Workout</a></li>
 						<li><a href="#history" data-transition="slide" data-icon="star">History</a></li>
+						<li><a href="#settings" data-transition="slide" data-icon="star">Settings</a></li>
 					</ul>
 				</div>
 			</div>
@@ -69,7 +73,7 @@
 					<p>Latitude: <span data-bind="text: latitude"></span></p>
 					<p>Longitude: <span data-bind="text: longitude"></span></p>
 					
-					<div id="map-canvas" style="width:100%;height:300px;"></div>
+					<div id="track-map-canvas" style="width:100%;height:300px;"></div>
 				</div>		
 			</div>
 		</div>
@@ -84,6 +88,7 @@
 						<li><a href="#home" data-transition="slide" data-icon="home">Home</a></li>
 						<li><a href="#tracking" data-transition="slide" data-icon="plus">Track Workout</a></li>
 						<li><a href="#history" data-transition="slide" data-icon="star" data-theme="b">History</a></li>
+						<li><a href="#settings" data-transition="slide" data-icon="star">Settings</a></li>
 					</ul>
 				</div>
 		    </div>
@@ -106,6 +111,7 @@
 						<li><a href="#home" data-transition="slide" data-icon="home">Home</a></li>
 						<li><a href="#tracking" data-transition="slide" data-icon="plus">Track Workout</a></li>
 						<li><a href="#history" data-transition="slide" data-icon="star" data-theme="b">History</a></li>
+						<li><a href="#settings" data-transition="slide" data-icon="star">Settings</a></li>
 					</ul>
 				</div>
 		    </div>
@@ -114,6 +120,28 @@
 		    	<p>Distance: <span data-bind="text: distance"></span>km</p>
 		        <div id="track-info-map-canvas" style="width:100%;height:300px;"></div>
 		    </div>
+		</div>
+		
+		<!-- Start of Settings page -->
+		<div data-role="page" id="settings">
+		
+			<div data-role="header">
+			
+				<h1>Home</h1>
+			
+				<div data-role="navbar">
+					<ul>
+						<li><a href="#home" data-transition="slide" data-icon="home">Home</a></li>
+						<li><a href="#tracking" data-transition="slide" data-icon="plus">Track Workout</a></li>
+						<li><a href="#history" data-transition="slide" data-icon="star">History</a></li>
+						<li><a href="#settings" data-transition="slide" data-icon="gear" data-theme="b">Settings</a></li>
+					</ul>
+				</div>
+			</div>
+		
+			<div data-role="content">
+				<div data-role="button" data-bind="click: clear">Clear Workouts</div>
+			</div>	
 		</div>
 	</body>
 </html>

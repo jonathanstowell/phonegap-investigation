@@ -24,17 +24,19 @@ var track_info_model = {};
 	});
 	
 	jQuery(document).bind('rideDetails', function (event, key) {
-		var data = JSON.parse(window.localStorage.getItem(key));
+		var item = workout_repository.getByKey(key);
 		
-		index.name(key);
-		index.trackingData(data);
+		index.name(item.name);
+		index.trackingData(item.trackingData);
 		
-		index.map = new google.maps.Map(document.getElementById("track-info-map-canvas"), { zoom: 5, center: new google.maps.LatLng(index.trackingData()[0].coords.latitude, index.trackingData()[0].coords.longitude), mapTypeId: google.maps.MapTypeId.ROADMAP });
+		var pos = new google.maps.LatLng(index.trackingData[0].coords.latitude, index.trackingData[0].coords.longitude);
+		
+		index.map = new google.maps.Map(jQuery("#track-info-map-canvas")[0], { zoom: 10, center: pos, mapTypeId: google.maps.MapTypeId.ROADMAP });
 		
 		var trackCoords = [];
 
-	    for(i=0; i < index.trackingData().length; i++){
-	    	trackCoords.push(new google.maps.LatLng(index.trackingData()[i].coords.latitude, index.trackingData()[i].coords.longitude));
+	    for(i=0; i < index.trackingData().length - 1; i++){
+	    	trackCoords.push(new google.maps.LatLng(index.trackingData[i].coords.latitude, index.trackingData[i].coords.longitude));
 	    }
 	    
 	    var trackPath = new google.maps.Polyline({
@@ -46,7 +48,7 @@ var track_info_model = {};
 
 	    trackPath.setMap(index.map);
 		
-		jQuery.mobile.changePage("#track-info", "slide");
+		jQuery.mobile.changePage("#track-info", "slide", false, false);
     });
 	
 	jQuery(function(){

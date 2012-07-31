@@ -13,8 +13,10 @@ var history_model = {};
 	jQuery('#history').live('pageshow', function () {
 		index.tracks.removeAll();
 		
-		for(i=0; i < window.localStorage.length; i++){
-			index.tracks.push({ name: window.localStorage.key(i) });
+		var items = workout_repository.getAll();
+		
+		for(i=0; i < items.length; i++){
+			index.tracks.push(items[0]);
 		}
 		
 		jQuery("#history-tracklist").listview('refresh');
