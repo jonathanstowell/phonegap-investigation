@@ -16,14 +16,14 @@ var track_info_model = {};
 		if (typeof index.startDateTime() != 'undefined')
 			return index.startDateTime().format("dddd, mmmm dS, yyyy, h:MM:ss TT");
 		
-		return "Not Set";
+		return index.startDateTime();
 	});
 	
 	index.endDateTimeDisplay = ko.computed(function() {
 		if (typeof index.endDateTime() != 'undefined')
 			return index.endDateTime().format("dddd, mmmm dS, yyyy, h:MM:ss TT");
 		
-		return "Not Set";
+		return index.endDateTime();
 	});
 	
 	index.elapsedTime = ko.computed(function() {

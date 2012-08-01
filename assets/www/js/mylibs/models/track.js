@@ -4,16 +4,18 @@ var tracking_model = {};
 	
 	tracking_model = index;
 	
+	var timerProcessIdentifier;
+	var watch = null;
+	var map = null;
+	var timerInstance = null;
+	
 	index.name = ko.observable();
-	index.watch = null;
 	index.isTracking = ko.observable(false);
 	index.startDateTime = ko.observable();
-	var timerProcessIdentifier;
 	index.elapsedTime = ko.observable();
 	index.endDateTime = ko.observable();
 	index.latitude = ko.observable();
 	index.longitude = ko.observable();
-	index.map = null;
 	index.errors = ko.observableArray([]);
 	
 	index.currentTrackingData = ko.observableArray([]);
@@ -27,7 +29,7 @@ var tracking_model = {};
 		index.startDateTime(new Date());
 		index.elapsedTime("Waiting for GPS...")
 		
-		index.watch = navigator.geolocation.watchPosition(function(position) {
+		watch = navigator.geolocation.watchPosition(function(position) {
 			index.latitude(position.coords.latitude);
 			index.longitude(position.coords.longitude);
 			
@@ -40,10 +42,10 @@ var tracking_model = {};
 			
 			var pos = new google.maps.LatLng(index.latitude(), index.longitude());
 			
-			if (index.map == null)
-				index.map = new google.maps.Map(jQuery("#track-map-canvas")[0], { zoom: 15, center: pos, mapTypeId: google.maps.MapTypeId.ROADMAP });
+			if (map == null)
+				map = new google.maps.Map(jQuery("#track-map-canvas")[0], { zoom: 15, center: pos, mapTypeId: google.maps.MapTypeId.ROADMAP });
 			else
-				index.map.setCenter(pos);
+				map.setCenter(pos);
 			
 			var trackCoords = [];
 
@@ -58,7 +60,7 @@ var tracking_model = {};
 		      strokeWeight: 2
 		    });
 
-		    trackPath.setMap(index.map);
+		    trackPath.setMap(map);
 		    
 		}, function(error) {
 			console.log(error);
@@ -69,53 +71,20 @@ var tracking_model = {};
 	index.stopTracking = function() {
 		index.isTracking(false);
 		index.endDateTime(new Date());
-		
-		console.log("Before End.");
-		if (index.currentTrackingData().length > 0) {
-			console.log("Stop Timer Process ID:" + timerProcessIdentifier);
-			clearInterval(timerProcessIdentifier);
-		}
-		workout_repository.save(index.name(), { name: index.name(), trackingData: index.currentTrackingData(), startDateTime: index.startDateTime(), endDateTime: index.endDateTime(), distance: index.distance() });	
+		workout_repository.save({ name: index.name(), trackingData: index.currentTrackingData(), startDateTime: index.startDateTime(), endDateTime: index.endDateTime(), distance: index.distance() });	
 		index.clear();
 	};
 	
 	index.distance = ko.computed(function(){
-		var total_km = 0;
-
-		for(i = 0; i < index.currentTrackingData().length; i++){
-		    
-		    if(i == (index.currentTrackingData().length - 1)){
-		        break;
-		    }
-		    
-		    total_km += gps_distance(index.currentTrackingData()[i].coords.latitude, index.currentTrackingData()[i].coords.longitude, index.currentTrackingData()[i+1].coords.latitude, index.currentTrackingData()[i+1].coords.longitude);
-		}
-		
-		return total_km.toFixed(2);
+		return totalDistanceFromCoords(index.currentTrackingData());
 	});
 	
 	index.timer = function() {
-		var timeend = new Date();
-		var diff = timeend.getTime() - index.startDateTime().getTime();
-		
-		timeend.setTime(diff);
-		
-		var hours_passed = timeend.getHours();
-		if(hours_passed < 10){
-			hours_passed = "0" + hours_passed;
+		if (timerInstance == null) {
+			timerInstance = new timer(index.startDateTime());
 		}
 		
-		var minutes_passed = timeend.getMinutes();
-		if(minutes_passed < 10){
-			minutes_passed = "0" + minutes_passed;
-		}
-		
-		var seconds_passed = timeend.getSeconds();
-		if(seconds_passed < 10){
-			seconds_passed = "0" + seconds_passed;
-		}
-		
-		index.elapsedTime(hours_passed + "h " + minutes_passed + "m " + seconds_passed + "s");
+		index.elapsedTime(timerInstance.getElapsedTime());
 	};
 	
 	index.validate = function() {
@@ -140,16 +109,18 @@ var tracking_model = {};
 	});
 	
 	index.clear = function(){
-		if (index.watch != null) {
-			navigator.geolocation.clearWatch(index.watch);
-		}
+		if (watch != null) { navigator.geolocation.clearWatch(index.watch); }	
+		if (index.currentTrackingData().length > 0) { clearInterval(timerProcessIdentifier); }
 		
-		index.map = null;
+		map = null;
+		timer = null;
 		index.name("");
 		index.latitude("");
 		index.longitude("");
 		index.startDateTime("");
 		index.endDateTime("");
+		index.currentTrackingData.removeAll();
+		index.errors.removeAll();
 	};
 	
 	jQuery(function(){

@@ -19,3 +19,45 @@ function gps_distance(lat1, lon1, lat2, lon2)
     
     return d;
 }
+
+function timer(startdate) {
+	this.startdate = startdate;
+	this.getElapsedTime = function() {
+		var timeend = new Date();
+		var diff = timeend.getTime() - startdate.getTime();
+		
+		timeend.setTime(diff);
+		
+		var hours_passed = timeend.getHours();
+		if(hours_passed < 10){
+			hours_passed = "0" + hours_passed;
+		}
+		
+		var minutes_passed = timeend.getMinutes();
+		if(minutes_passed < 10){
+			minutes_passed = "0" + minutes_passed;
+		}
+		
+		var seconds_passed = timeend.getSeconds();
+		if(seconds_passed < 10){
+			seconds_passed = "0" + seconds_passed;
+		}
+		
+		return hours_passed + "h " + minutes_passed + "m " + seconds_passed + "s";
+	};
+}
+
+function totalDistanceFromCoords(items) {
+	var total_km = 0;
+
+	for(i = 0; i < items.length; i++){
+	    
+	    if(i == (items.length - 1)){
+	        break;
+	    }
+	    
+	    total_km += gps_distance(items[i].coords.latitude, items[i].coords.longitude, items[i+1].coords.latitude, items[i+1].coords.longitude);
+	}
+	
+	return total_km.toFixed(2);
+}

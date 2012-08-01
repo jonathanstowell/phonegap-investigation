@@ -8,8 +8,8 @@ var home_model = {};
 	index.distanceCount = ko.observable();
 	
 	jQuery('#home').live('pageshow', function () {
-		index.rideCount(workout_repository.count());
-		index.distanceCount(workout_repository.totalDistance());
+		index.rideCount(statistic_repository.overallworkouts());
+		index.distanceCount(statistic_repository.overalldistance());
 	});
 	
 	jQuery(function(){

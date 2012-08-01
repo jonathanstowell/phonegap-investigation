@@ -5,7 +5,7 @@ var settings_model = {};
 	settings_model = index;
 	
 	index.clear = function() {
-		workout_repository.clear();
+		jQuery(document).trigger('clear-all');
 	};
 	
 	jQuery(function(){
