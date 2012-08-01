@@ -12,46 +12,59 @@ var workout_repository = {};
 		}
 		
 		return ret;
-	}
+	};
 	
 	index.totalDistance = function() {
-		var all = index.getAll();
-		
-		var total_km = 0;
-		
-		for(i = 0; i < all.length; i++){
-			total_km += all[i].distance;
+		if (index.exists('totalDistance') == false) {
+			return window.localStorage.getItem('totalDistance');
 		}
 		
-		return total_km;
-	}
+		return "0.00";
+	};
 	
-	index.isUniqueName = function(key) {
+	index.exists = function(key) {
 		return window.localStorage.getItem(key) === null;
-	}
+	};
 	
 	index.getByKey = function(key) {
 		return JSON.parse(window.localStorage.getItem(key));
-	}
+	};
 	
 	index.getByIndex = function(index) {
 		return JSON.parse(window.localStorage.getItem(window.localStorage.key(index)));
-	}
+	};
 	
 	index.save = function(key, item) {
+		index.updateTotalDistance(item.distance);
 		window.localStorage.setItem(key, ko.toJSON(item));
-	}
+	};
+	
+	index.updateTotalDistance = function(distance) {
+		if (index.exists('totalDistance') == false) {
+			window.localStorage.setItem('totalDistance', distance);
+		} else {
+			var count = window.localStorage.getItem('totalDistance');
+			
+			if (count) {
+				window.localStorage.setItem('totalDistance', parseInt(count) + parseInt(distance));
+			} else {
+				window.localStorage.setItem('totalDistance', distance);
+			}
+		}
+	};
 	
 	index.deleteItem = function(key) {
+		var item = index.getByKey(key);
+		index.updateTotalDistance(-item.distance);
 		window.localStorage.removeItem(key);
-	}
+	};
 	
 	index.clear = function() {
 		window.localStorage.clear();
-	}
+	};
 	
 	index.count = function() {
 		return window.localStorage.length;
-	}
+	};
 	
 } (workout_repository))

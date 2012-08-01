@@ -6,7 +6,7 @@ var settings_model = {};
 	
 	index.clear = function() {
 		workout_repository.clear();
-	}
+	};
 	
 	jQuery(function(){
 		ko.applyBindings(index, jQuery("#settings")[0]);

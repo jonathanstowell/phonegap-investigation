@@ -9,6 +9,51 @@ var track_info_model = {};
 	index.map = null;
 	index.hasMap = ko.observable(false);
 	index.distance = ko.observable();
+	index.startDateTime = ko.observable();
+	index.endDateTime = ko.observable();
+	
+	index.startDateTimeDisplay = ko.computed(function() {
+		if (typeof index.startDateTime() != 'undefined')
+			return index.startDateTime().format("dddd, mmmm dS, yyyy, h:MM:ss TT");
+		
+		return "Not Set";
+	});
+	
+	index.endDateTimeDisplay = ko.computed(function() {
+		if (typeof index.endDateTime() != 'undefined')
+			return index.endDateTime().format("dddd, mmmm dS, yyyy, h:MM:ss TT");
+		
+		return "Not Set";
+	});
+	
+	index.elapsedTime = ko.computed(function() {
+		if (typeof index.startDateTime() != 'undefined' && typeof index.endDateTime() != 'undefined') {
+			var timeend = index.endDateTime();
+			var diff = timeend.getTime() - index.startDateTime().getTime();
+			
+			timeend.setTime(diff);
+			
+			var hours_passed = timeend.getHours();
+			if(hours_passed < 10){
+				hours_passed = "0" + hours_passed;
+			}
+			
+			var minutes_passed = timeend.getMinutes();
+			if(minutes_passed < 10){
+				minutes_passed = "0" + minutes_passed;
+			}
+			
+			var seconds_passed = timeend.getSeconds();
+			if(seconds_passed < 10){
+				seconds_passed = "0" + seconds_passed;
+			}
+			
+			return hours_passed + "h " + minutes_passed + "m " + seconds_passed + "s";
+		}
+		else {
+			return "Not Set";
+		}
+	});
 	
 	jQuery(document).bind('rideDetails', function (event, key) {
 		index.clear();
@@ -17,14 +62,12 @@ var track_info_model = {};
 		
 		index.name(item.name);
 		index.distance(item.distance);
+		index.startDateTime(new Date(item.startDateTime));
+		index.endDateTime(new Date(item.endDateTime));
 		
 		if (item.trackingData[0] != null) {
 			var pos = new google.maps.LatLng(item.trackingData[0].coords.latitude, item.trackingData[0].coords.longitude);
-			
-			if (index.map == null)
-				index.map = new google.maps.Map(jQuery("#track-info-map-canvas")[0], { zoom: 15, center: pos, mapTypeId: google.maps.MapTypeId.ROADMAP });
-			else
-				index.map.setCenter(pos);
+			index.map = new google.maps.Map(jQuery("#track-info-map-canvas")[0], { zoom: 15, center: pos, mapTypeId: google.maps.MapTypeId.ROADMAP });
 			
 			var trackCoords = [];
 	
@@ -51,12 +94,12 @@ var track_info_model = {};
 		index.name("");
 		index.hasMap(false);
 		index.trackingData.removeAll();
-	}
+	};
 	
 	index.deleteItem = function() {
 		workout_repository.deleteItem(index.name());
 		jQuery.mobile.changePage("#history", "slide", false, false);
-	}
+	};
 	
 	jQuery(function(){
 		ko.applyBindings(index, jQuery("#track-info")[0]);

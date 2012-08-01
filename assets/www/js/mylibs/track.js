@@ -8,6 +8,8 @@ var tracking_model = {};
 	index.watch = null;
 	index.isTracking = ko.observable(false);
 	index.startDateTime = ko.observable();
+	var timerProcessIdentifier;
+	index.elapsedTime = ko.observable();
 	index.endDateTime = ko.observable();
 	index.latitude = ko.observable();
 	index.longitude = ko.observable();
@@ -23,10 +25,16 @@ var tracking_model = {};
 		
 		index.isTracking(true);
 		index.startDateTime(new Date());
+		index.elapsedTime("Waiting for GPS...")
 		
 		index.watch = navigator.geolocation.watchPosition(function(position) {
 			index.latitude(position.coords.latitude);
 			index.longitude(position.coords.longitude);
+			
+			if (index.currentTrackingData().length == 0) {
+				timerProcessIdentifier = setInterval('tracking_model.timer()', 1000);
+				console.log("Start Timer Process ID:" + timerProcessIdentifier);
+			}
 			
 			index.currentTrackingData.push(position);
 			
@@ -62,8 +70,12 @@ var tracking_model = {};
 		index.isTracking(false);
 		index.endDateTime(new Date());
 		
-		workout_repository.save(index.name(), { name: index.name(), trackingData: index.currentTrackingData(), startDateTime: index.startDateTime(), endDateTime: index.endDateTime(), distance: index.distance() });
-		
+		console.log("Before End.");
+		if (index.currentTrackingData().length > 0) {
+			console.log("Stop Timer Process ID:" + timerProcessIdentifier);
+			clearInterval(timerProcessIdentifier);
+		}
+		workout_repository.save(index.name(), { name: index.name(), trackingData: index.currentTrackingData(), startDateTime: index.startDateTime(), endDateTime: index.endDateTime(), distance: index.distance() });	
 		index.clear();
 	};
 	
@@ -82,6 +94,30 @@ var tracking_model = {};
 		return total_km.toFixed(2);
 	});
 	
+	index.timer = function() {
+		var timeend = new Date();
+		var diff = timeend.getTime() - index.startDateTime().getTime();
+		
+		timeend.setTime(diff);
+		
+		var hours_passed = timeend.getHours();
+		if(hours_passed < 10){
+			hours_passed = "0" + hours_passed;
+		}
+		
+		var minutes_passed = timeend.getMinutes();
+		if(minutes_passed < 10){
+			minutes_passed = "0" + minutes_passed;
+		}
+		
+		var seconds_passed = timeend.getSeconds();
+		if(seconds_passed < 10){
+			seconds_passed = "0" + seconds_passed;
+		}
+		
+		index.elapsedTime(hours_passed + "h " + minutes_passed + "m " + seconds_passed + "s");
+	};
+	
 	index.validate = function() {
 		index.errors.removeAll();
 		
@@ -89,7 +125,7 @@ var tracking_model = {};
 			index.errors.push({ value: "Name is required." })
 		}
 		
-		if (workout_repository.isUniqueName(index.name()) == false) {
+		if (workout_repository.exists(index.name()) == false) {
 			index.errors.push({ value: "Name must be unique." })
 		}
 		
@@ -97,7 +133,7 @@ var tracking_model = {};
 			return false;
 			
 		return true;
-	}
+	};
 	
 	jQuery('#tracking').live('pageshow', function () {
 		index.errors.removeAll();
