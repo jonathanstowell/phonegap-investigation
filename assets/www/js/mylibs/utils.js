@@ -20,9 +20,8 @@ function gps_distance(lat1, lon1, lat2, lon2)
     return d;
 }
 
-function timer(startdate) {
-	this.startdate = startdate;
-	this.getElapsedTime = function() {
+function timer() {
+	this.getElapsedTime = function(startdate) {
 		var timeend = new Date();
 		var diff = timeend.getTime() - startdate.getTime();
 		

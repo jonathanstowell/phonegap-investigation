@@ -100,10 +100,10 @@ var tracking_model = {};
 	
 	index.timer = function() {
 		if (timerInstance == null) {
-			timerInstance = new timer(index.startDateTime());
+			timerInstance = new timer();
 		}
 		
-		index.elapsedTime(timerInstance.getElapsedTime());
+		index.elapsedTime(timerInstance.getElapsedTime(index.startDateTime()));
 	};
 	
 	index.validate = function() {
