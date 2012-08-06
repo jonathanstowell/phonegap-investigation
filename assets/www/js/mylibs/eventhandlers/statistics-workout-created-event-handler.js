@@ -10,8 +10,8 @@ statistics_workout_created_event_handler = {};
 		if (item == null) {
 			statistic_repository.save({ overallworkouts: 1, overalldistance: parseFloat(workout.distance) });
 		} else {
-			item.overallworkouts += 1;
-			item.overalldistance += parseFloat(workout.distance);
+			item.overallworkouts = parseFloat(item.overallworkouts) + 1;
+			item.overalldistance = parseFloat(item.overalldistance) + parseFloat(workout.distance);
 			
 			statistic_repository.update(item);
 		}

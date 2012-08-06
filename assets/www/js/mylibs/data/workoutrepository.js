@@ -13,6 +13,10 @@ var workout_repository = {};
 		return db().query("workouts");
 	};
 	
+	index.getPaged = function(page, take) {
+		return db().query("workouts", function(row) { if(row.ID >= (page - 1) * take && row.ID <= (page * take)) { return true; } else { return false; } }, take);
+	};
+	
 	index.exists = function(key) {
 		return db().query("workouts", function(row) { if(row.name == key) { return true; } else { return false; } }, 1)[0] != null;
 	};

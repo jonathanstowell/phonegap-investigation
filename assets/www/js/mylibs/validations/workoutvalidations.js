@@ -4,18 +4,18 @@ var workout_validation = {};
 	
 	workout_validation = index;
 	
-	index.validate = function(item) {
-		var errors = new Array();
+	index.validate = function(item, container) {
+		container.removeAll();
 		
 		if (!item.name()) {
-			errors.push({ value: "Name is required." })
+			container.push({ value: "Name is required." })
 		}
 		
-		if (workout_repository.exists(item.name()) == false) {
-			errors.push({ value: "Name must be unique." })
+		if (item.name() && workout_repository.exists(item.name())) {
+			container.push({ value: "Name must be unique." })
 		}
 		
-		if (errors.length > 0)
+		if (container.length > 0)
 			return { result: false, errors: errors };
 			
 		return { result: true, errors: errors };

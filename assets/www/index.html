@@ -2,12 +2,13 @@
 <html>
 	<head>
 		<title>Exercise Tracker</title>
-		<link rel="stylesheet"  href="css/jquery.mobile-1.2.0-alpha.1.min.css" />
+		<link rel="stylesheet"  href="css/jquery.mobile.css" />
+		<link rel="stylesheet"  href="css/site.css" />
 		
-		<script src="js/libs/jquery-1.7.2.min.js"></script>
-		<script src="js/libs/jquery.mobile-1.2.0-alpha.min.js"></script>
-		<script src="js/libs/knockout-2.0.0.js"></script>
-		<script src="js/libs/cordova-2.0.0.js"></script>
+		<script src="js/libs/jquery.js"></script>
+		<script src="js/libs/jquery.mobile.js"></script>
+		<script src="js/libs/knockout.js"></script>
+		<script src="js/libs/cordova.js"></script>
 		<script src="js/libs/date.format.js"></script>
 		<script src="js/libs/localstoragedb.js"></script>
 		
@@ -19,6 +20,8 @@
 		
 		<script src="js/mylibs/mappings/statisticsmapping.js"></script>
 		<script src="js/mylibs/mappings/workoutmapping.js"></script>
+		
+		<script src="js/mylibs/validations/workoutvalidations.js"></script>
 		
 		<script src="js/mylibs/data/statisticsrepository.js"></script>
 		<script src="js/mylibs/data/workoutrepository.js"></script>
@@ -52,8 +55,10 @@
 			</div>
 		
 			<div data-role="content">
-				<p>Total Rides: <span data-bind="text: rideCount"></span></p>
-				<p>Total Distance Covered: <span data-bind="text: distanceCount"></span>km</p>
+				<ul data-role="listview" data-inset="true" >
+					<li>Total Rides: <span class="ui-li-count" data-bind="text: rideCount"></span></li>
+					<li>Total Kilometers Covered: <span class="ui-li-count" data-bind="text: distanceCount"></span></li>
+				</ul>
 			</div>	
 		</div>
 		
@@ -76,31 +81,34 @@
 				<div data-role="fieldcontain" class="ui-hide-label" data-bind="visible: isTracking() == false">
 					<label for="name">Track Name:</label>
 					<input type="text" name="name" id="name" data-bind="value: name" placeholder="Track Name"/>
-					<div data-bind="foreach: errors">
-						<p data-bind="text: value"></p>
-					</div>
+					<ul id="track-errors-container" data-role="listview" data-inset="true" data-bind="foreach: errors" data-theme="e">
+		        		<li data-icon="alert" data-iconpos="right"><a href="#" data-bind="text: value"></a></li>
+		        	</ul>
 				</div>
 		
 				<div data-role="button" data-bind="click: startTracking, visible: isTracking() == false" data-icon="check">Start Tracking</div>
-				<div data-role="button" data-bind="click: stopTracking, visible: isTracking" data-icon="delete">Stop Tracking</div>
 				
 				<div data-bind="visible: isTracking() == true && isWaitingForGPS() == true">
-					<p>Currently waiting for GPS...</p>
+					<ul data-role="listview" data-inset="true">
+						<li>Currently waiting for GPS...</li>
+					</ul>
 				</div>
 				
 				<div id="current-coords" data-bind="visible: isTracking() == true && isWaitingForGPS() == false">
-					<p>Name: <span data-bind="text: name"></span></p>
-					<p>Distance: <span data-bind="text: distance"></span>km</p>
-					<p>Elapsed Time: <span data-bind="text: elapsedTime"></span></p>
-					<p>Latitude: <span data-bind="text: latitude"></span></p>
-					<p>Longitude: <span data-bind="text: longitude"></span></p>
+					<ul data-role="listview" data-inset="true">
+						<li>Name: <span data-bind="text: name"></span></li>
+						<li>Distance: <span data-bind="text: distance"></span>km</li>
+						<li>Elapsed Time: <span data-bind="text: elapsedTime"></span></li>
+					</ul>
 					
-					<a href="#track-popup-map" data-rel="popup" data-role="button" data-transition="pop">Map</a>
+					<a href="#track-popup-map" data-rel="popup" data-role="button" data-transition="pop" data-theme="b" data-icon="info">Map</a>
 					<div data-role="popup" id="track-popup-map" data-overlay-theme="a" data-theme="a" data-corners="false" data-tolerance="15,15">
 					    <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>			 
 					    <div id="track-map-canvas" data-bind="visible: isTracking"></div>
 					</div>
-				</div>		
+				</div>
+				
+				<div data-role="button" data-bind="click: stopTracking, visible: isTracking" data-icon="delete">Stop Tracking</div>	
 			</div>
 		</div>
 		
@@ -119,11 +127,18 @@
 				</div>
 		    </div>
 		
-		    <div data-role="content">	
-		        <p>Recorded Workouts: <span data-bind="text: tracks().length"></span></p>        
+		    <div data-role="content">
+			    <ul data-role="listview" data-inset="true" >
+					<li>Recorded Workouts: <span class="ui-li-count" data-bind="text: tracksCount"></span></li>
+				</ul>     
 		        <ul id="history-tracklist" data-role="listview" data-inset="true" data-bind="foreach: tracks">
 		        	<li><a href='#' data-bind="click: function(event) { $parent.raiseDetails($data); }"><span data-bind="text: name"></span></a></li>
 		        </ul>
+		        
+		        <div data-role="controlgroup">
+		        	<button data-iconpos="right" data-icon="arrow-r" data-bind="click: function(event) { page('next'); }">Next</button>
+					<button data-iconpos="left" data-icon="arrow-l" data-bind="click: function(event) { page('prev'); }">Previous</button>
+				</div>
 		    </div>
 		</div>
 		
@@ -143,12 +158,14 @@
 		    </div>
 		
 		    <div data-role="content">	
-		    	<p>Distance: <span data-bind="text: distance"></span>km</p>
-		    	<p>Start Time: <span data-bind="text: startDateTimeDisplay"></span></p>
-		    	<p>End Time: <span data-bind="text: endDateTimeDisplay"></span></p>
-		    	<p>Elapsed Time: <span data-bind="text: elapsedTime"></span></p>
+		    	<ul data-role="listview" data-inset="true" >
+					<li>Distance Covered: <span data-bind="text: distance"></span>km</li>
+					<li>Start Time: <span data-bind="text: startDateTimeDisplay"></span></li>
+					<li>End Time: <span data-bind="text: endDateTimeDisplay"></span></li>
+					<li>Elapsed Time: <span data-bind="text: elapsedTime"></span></li>
+				</ul>
 		    	
-		    	<a href="#track-info-popup-map" data-rel="popup" data-role="button" data-transition="pop" data-bind="visible: isTracking">Map</a>
+		    	<a href="#track-info-popup-map" data-rel="popup" data-role="button" data-transition="pop" data-theme="b" data-icon="info">Map</a>
 				<div data-role="popup" id="track-info-popup-map" data-overlay-theme="a" data-theme="a" data-corners="false" data-tolerance="15,15">
 					<a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
 					<div id="track-info-map-canvas" data-bind="visible: hasMap"></div>

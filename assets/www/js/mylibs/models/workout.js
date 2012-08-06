@@ -23,8 +23,9 @@ var tracking_model = {};
 	
 	index.startTracking = function() {
 		
-		if(index.validate() == false)
+		if(index.validate() == false) {
 			return;
+		}
 		
 		index.isTracking(true);
 		index.isWaitingForGPS(true);
@@ -44,6 +45,16 @@ var tracking_model = {};
 			}
 			
 			index.currentTrackingData.push(position);
+			
+			var size = fullScreen(0, 1),
+	    		w = size.width,
+	    		h = size.height;
+	
+			jQuery("#track-map-canvas")
+	        	.attr("width", w)
+	        	.attr("height", h);
+				 
+			jQuery("#track-map-canvas").css({ "width": w, "height" : h });
 			
 			var pos = new google.maps.LatLng(index.latitude(), index.longitude());
 			
@@ -66,6 +77,7 @@ var tracking_model = {};
 		    });
 
 		    trackPath.setMap(map);
+		    setTimeout(function() { google.maps.event.trigger(map,'resize'); map.setCenter(pos); }, 500);
 		    
 			}, function(error) {
 				console.log(error);
@@ -78,6 +90,7 @@ var tracking_model = {};
 		index.isWaitingForGPS(false);
 		index.endDateTime(new Date());
 		workout_repository.save({ name: index.name(), trackingData: index.currentTrackingData(), startDateTime: index.startDateTime(), endDateTime: index.endDateTime(), distance: index.distance() });	
+		jQuery(document).trigger('rideDetails', [index.name()]);
 		index.clear();
 	};
 	
@@ -100,9 +113,11 @@ var tracking_model = {};
 			index.errors.push({ value: "Name is required." })
 		}
 		
-		if (workout_repository.exists(index.name())) {
+		if (index.name() && workout_repository.exists(index.name())) {
 			index.errors.push({ value: "Name must be unique." })
 		}
+		
+		jQuery("#track-errors-container").listview('refresh');
 		
 		if (index.errors().length > 0)
 			return false;
@@ -131,35 +146,6 @@ var tracking_model = {};
 	
 	jQuery(function(){
 		ko.applyBindings(index, jQuery("#tracking")[0]);
-	});
-	
-	jQuery(document).on( "pageinit", function() {
-		jQuery("#track-map-canvas")
-        .attr("width", 0)
-        .attr("height", 0);
-		  
-		jQuery("#track-map-canvas").css({ "width" : 0, "height" : 0 });
-		 	     
-		jQuery("#track-popup-map").on({
-	        popupbeforeposition: function() {
-	            var size = fullScreen(0, 1),
-	                w = size.width,
-	                h = size.height;
-	
-	            jQuery("#track-map-canvas")
-	                .attr("width", w)
-	                .attr("height", h);
-						 
-	            jQuery("#track-map-canvas").css({ "width": w, "height" : h });
-	        },
-	        popupafterclose: function() {
-	        	jQuery("#track-map-canvas")
-	                .attr("width", 0)
-	                .attr("height", 0);
-						 
-	        	jQuery("#track-map-canvas").css({ "width": 0, "height" : 0 });
-	        }
-	    });
 	});
 	
 } (tracking_model))

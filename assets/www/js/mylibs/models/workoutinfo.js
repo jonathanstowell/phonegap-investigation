@@ -6,7 +6,7 @@ var track_info_model = {};
 	
 	index.name = ko.observable();
 	index.trackingData = ko.observableArray([]);
-	index.map = null;
+	var map = null;
 	index.hasMap = ko.observable(false);
 	index.distance = ko.observable();
 	index.startDateTime = ko.observable();
@@ -65,18 +65,30 @@ var track_info_model = {};
 		index.startDateTime(new Date(item.startDateTime));
 		index.endDateTime(new Date(item.endDateTime));
 		
+		var size = fullScreen(0, 1),
+        	w = size.width,
+        	h = size.height;
+
+	    jQuery("#track-info-map-canvas")
+	        .attr("width", w)
+	        .attr("height", h);
+				 
+	    jQuery("#track-info-map-canvas").css({ "width": w, "height" : h });
+		
 		if (item.trackingData[0] != null) {
 			console.log("Coords" + item.trackingData[0].coords.latitude + " " + item.trackingData[0].coords.longitude)
 			
 			var pos = new google.maps.LatLng(item.trackingData[0].coords.latitude, item.trackingData[0].coords.longitude);
-			index.map = new google.maps.Map(jQuery("#track-info-map-canvas")[0], { zoom: 15, center: pos, mapTypeId: google.maps.MapTypeId.ROADMAP });
+			map = new google.maps.Map(jQuery("#track-info-map-canvas")[0], { zoom: 15, center: pos, mapTypeId: google.maps.MapTypeId.ROADMAP });
 			
 			var trackCoords = [];
-	
+			
+			console.log("length = " + item.trackingData.length);
+			
 		    for(i=0; i < item.trackingData.length; i++){
 		    	index.trackingData.push(item.trackingData[i]);
 		    	trackCoords.push(new google.maps.LatLng(item.trackingData[i].coords.latitude, item.trackingData[i].coords.longitude));
-		    	console.log("Coords" + item.trackingData[i].coords.latitude + " " + item.trackingData[i].coords.longitude)
+		    	console.log(i + " Coords " + item.trackingData[i].coords.latitude + " " + item.trackingData[i].coords.longitude)
 		    }
 		    
 		    var trackPath = new google.maps.Polyline({
@@ -86,7 +98,8 @@ var track_info_model = {};
 		      strokeWeight: 2
 		    });
 	
-		    trackPath.setMap(index.map);
+		    trackPath.setMap(map);
+		    setTimeout(function() { google.maps.event.trigger(map,'resize'); map.setCenter(pos); }, 500);
 		    index.hasMap(true);
 		}
 		
@@ -106,35 +119,6 @@ var track_info_model = {};
 	
 	jQuery(function(){
 		ko.applyBindings(index, jQuery("#track-info")[0]);
-	});
-	
-	jQuery(document).on("pageinit", function() {
-		jQuery("#track-info-map-canvas")
-        .attr("width", 0)
-        .attr("height", 0);
-		  
-		jQuery("#track-info-map-canvas").css({ "width" : 0, "height" : 0 });
-		 	     
-		jQuery("#track-info-popup-map").on({
-	        popupbeforeposition: function() {
-	            var size = fullScreen(0, 1),
-	                w = size.width,
-	                h = size.height;
-	
-	            jQuery("#track-info-map-canvas")
-	                .attr("width", w)
-	                .attr("height", h);
-						 
-	            jQuery("#track-info-map-canvas").css({ "width": w, "height" : h });
-	        },
-	        popupafterclose: function() {
-	        	jQuery("#track-info-map-canvas")
-	                .attr("width", 0)
-	                .attr("height", 0);
-						 
-	        	jQuery("#track-info-map-canvas").css({ "width": 0, "height" : 0 });
-	        }
-	    });
 	});
 	
 } (track_info_model))
