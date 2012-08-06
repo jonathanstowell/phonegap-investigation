@@ -14,7 +14,7 @@ var workout_repository = {};
 	};
 	
 	index.exists = function(key) {
-		return db().query("workouts", function(row) { if(row.name == key) { return true; } else { return false; } }) != null;
+		return db().query("workouts", function(row) { if(row.name == key) { return true; } else { return false; } }, 1)[0] != null;
 	};
 	
 	index.getByKey = function(key) {

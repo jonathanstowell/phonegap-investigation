@@ -11,6 +11,7 @@ var tracking_model = {};
 	
 	index.name = ko.observable();
 	index.isTracking = ko.observable(false);
+	index.isWaitingForGPS = ko.observable(false);
 	index.startDateTime = ko.observable();
 	index.elapsedTime = ko.observable();
 	index.endDateTime = ko.observable();
@@ -26,10 +27,14 @@ var tracking_model = {};
 			return;
 		
 		index.isTracking(true);
+		index.isWaitingForGPS(true);
+		
 		index.startDateTime(new Date());
-		index.elapsedTime("Waiting for GPS...")
 		
 		watch = navigator.geolocation.watchPosition(function(position) {
+			
+			index.isWaitingForGPS(false);
+			
 			index.latitude(position.coords.latitude);
 			index.longitude(position.coords.longitude);
 			
@@ -62,14 +67,15 @@ var tracking_model = {};
 
 		    trackPath.setMap(map);
 		    
-		}, function(error) {
-			console.log(error);
-		}, 
-		{ timeout: 1500, enableHighAccuracy: true });
+			}, function(error) {
+				console.log(error);
+			}, 
+			{ timeout: 1500, enableHighAccuracy: true });	
 	};
 	
 	index.stopTracking = function() {
 		index.isTracking(false);
+		index.isWaitingForGPS(false);
 		index.endDateTime(new Date());
 		workout_repository.save({ name: index.name(), trackingData: index.currentTrackingData(), startDateTime: index.startDateTime(), endDateTime: index.endDateTime(), distance: index.distance() });	
 		index.clear();
@@ -94,7 +100,7 @@ var tracking_model = {};
 			index.errors.push({ value: "Name is required." })
 		}
 		
-		if (workout_repository.exists(index.name()) == false) {
+		if (workout_repository.exists(index.name())) {
 			index.errors.push({ value: "Name must be unique." })
 		}
 		
@@ -109,8 +115,8 @@ var tracking_model = {};
 	});
 	
 	index.clear = function(){
-		if (watch != null) { navigator.geolocation.clearWatch(index.watch); }	
-		if (index.currentTrackingData().length > 0) { clearInterval(timerProcessIdentifier); }
+		if (watch != null) { clearInterval(watch); }	
+		if (timerInstance != null) { clearInterval(timerProcessIdentifier); }
 		
 		map = null;
 		timer = null;
@@ -125,6 +131,35 @@ var tracking_model = {};
 	
 	jQuery(function(){
 		ko.applyBindings(index, jQuery("#tracking")[0]);
+	});
+	
+	jQuery(document).on( "pageinit", function() {
+		jQuery("#track-map-canvas")
+        .attr("width", 0)
+        .attr("height", 0);
+		  
+		jQuery("#track-map-canvas").css({ "width" : 0, "height" : 0 });
+		 	     
+		jQuery("#track-popup-map").on({
+	        popupbeforeposition: function() {
+	            var size = fullScreen(0, 1),
+	                w = size.width,
+	                h = size.height;
+	
+	            jQuery("#track-map-canvas")
+	                .attr("width", w)
+	                .attr("height", h);
+						 
+	            jQuery("#track-map-canvas").css({ "width": w, "height" : h });
+	        },
+	        popupafterclose: function() {
+	        	jQuery("#track-map-canvas")
+	                .attr("width", 0)
+	                .attr("height", 0);
+						 
+	        	jQuery("#track-map-canvas").css({ "width": 0, "height" : 0 });
+	        }
+	    });
 	});
 	
 } (tracking_model))

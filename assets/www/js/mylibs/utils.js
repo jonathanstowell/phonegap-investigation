@@ -61,3 +61,13 @@ function totalDistanceFromCoords(items) {
 	
 	return total_km.toFixed(2);
 }
+
+function fullScreen(padding, border) {
+    var scrWidth = $(window).width() - 30,
+        scrHeight = $(window).height() - 30;
+
+    return {
+        'width': scrWidth,
+        'height': scrHeight
+    };
+};
