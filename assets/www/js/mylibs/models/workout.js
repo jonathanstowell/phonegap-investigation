@@ -4,10 +4,9 @@ var tracking_model = {};
 	
 	tracking_model = index;
 	
-	var timerProcessIdentifier;
+	var timerProcessIdentifier = null;
 	var watch = null;
 	var map = null;
-	var timerInstance = null;
 	
 	index.name = ko.observable();
 	index.isTracking = ko.observable(false);
@@ -48,14 +47,10 @@ var tracking_model = {};
 			
 			index.currentTrackingData.push(position);
 			
-			var size = fullScreen(0, 1),
+			var size = screen_helper.fullScreen(0, 1),
 	    		w = size.width,
 	    		h = size.height;
 	
-			jQuery("#track-map-canvas")
-	        	.attr("width", w)
-	        	.attr("height", h);
-				 
 			jQuery("#track-map-canvas").css({ "width": w, "height" : h });
 			
 			var pos = new google.maps.LatLng(index.latitude(), index.longitude());
@@ -97,15 +92,11 @@ var tracking_model = {};
 	};
 	
 	index.distance = ko.computed(function(){
-		return totalDistanceFromCoords(index.currentTrackingData());
+		return map_helper.totalDistanceFromCoords(index.currentTrackingData());
 	});
 	
 	index.timer = function() {
-		if (timerInstance == null) {
-			timerInstance = new timer();
-		}
-		
-		index.elapsedTime(timerInstance.getElapsedTime(index.startDateTime()));
+		index.elapsedTime(time_helper.elapsedTime(index.startDateTime()));
 	};
 	
 	index.validate = function() {
@@ -133,10 +124,10 @@ var tracking_model = {};
 	
 	index.clear = function(){
 		if (watch != null) { clearInterval(watch); }	
-		if (timerInstance != null) { clearInterval(timerProcessIdentifier); }
+		if (timerProcessIdentifier != null) { clearInterval(timerProcessIdentifier); }
 		
 		map = null;
-		timer = null;
+		timerProcessIdentifier = null;
 		index.name("");
 		index.latitude("");
 		index.longitude("");

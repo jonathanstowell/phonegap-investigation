@@ -1,8 +1,8 @@
-var map_helpers = {};
+var map_helper = {};
 
 (function(index) {
 	
-	map_helpers = index;
+	map_helper = index;
 	
 	index.gps_distance = function(lat1, lon1, lat2, lon2)
 	{
@@ -36,4 +36,4 @@ var map_helpers = {};
 		return total_km.toFixed(2);
 	};
 	
-} (map_helpers))
+} (map_helper))

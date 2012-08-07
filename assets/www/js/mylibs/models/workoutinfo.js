@@ -28,32 +28,7 @@ var track_info_model = {};
 	});
 	
 	index.elapsedTime = ko.computed(function() {
-		if (typeof index.startDateTime() != 'undefined' && typeof index.endDateTime() != 'undefined') {
-			var timeend = index.endDateTime();
-			var diff = timeend.getTime() - index.startDateTime().getTime();
-			
-			timeend.setTime(diff);
-			
-			var hours_passed = timeend.getHours();
-			if(hours_passed < 10){
-				hours_passed = "0" + hours_passed;
-			}
-			
-			var minutes_passed = timeend.getMinutes();
-			if(minutes_passed < 10){
-				minutes_passed = "0" + minutes_passed;
-			}
-			
-			var seconds_passed = timeend.getSeconds();
-			if(seconds_passed < 10){
-				seconds_passed = "0" + seconds_passed;
-			}
-			
-			return hours_passed + "h " + minutes_passed + "m " + seconds_passed + "s";
-		}
-		else {
-			return "Not Set";
-		}
+		return time_helper.elapsedTimeBetween(index.startDateTime(), index.endDateTime());
 	});
 	
 	jQuery(document).bind('rideDetails', function (event, key) {
@@ -67,14 +42,10 @@ var track_info_model = {};
 		index.endDateTime(new Date(item.endDateTime));
 		index.hasConnection(connection_helper.hasConnection());
 		
-		var size = fullScreen(0, 1),
+		var size = screen_helper.fullScreen(0, 1),
         	w = size.width,
         	h = size.height;
-
-	    jQuery("#track-info-map-canvas")
-	        .attr("width", w)
-	        .attr("height", h);
-				 
+	 
 	    jQuery("#track-info-map-canvas").css({ "width": w, "height" : h });
 		
 		if (item.trackingData[0] != null) {
