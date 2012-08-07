@@ -8,22 +8,20 @@
 		<script src="js/libs/jquery.js"></script>
 		<script src="js/libs/jquery.mobile.js"></script>
 		<script src="js/libs/knockout.js"></script>
-		<script src="js/libs/cordova.js"></script>
 		<script src="js/libs/date.format.js"></script>
 		<script src="js/libs/localstoragedb.js"></script>
 		
 		<script type="text/javascript" src="http://maps.googleapis.com/maps/api/js?key=AIzaSyB0h2kuiWc30bAOfu41O6gX941waj23ZfQ&sensor=false"></script>
 		
 		<script src="js/mylibs/utils.js"></script>
+		<script src="js/mylibs/core/cordova/connectionhelper.js"></script>
 		
 		<script src="js/mylibs/data/databaseaccess.js"></script>
 		
-		<script src="js/mylibs/mappings/statisticsmapping.js"></script>
+		<script src="js/mylibs/mappings/statisticsoverallmapping.js"></script>
 		<script src="js/mylibs/mappings/workoutmapping.js"></script>
 		
-		<script src="js/mylibs/validations/workoutvalidations.js"></script>
-		
-		<script src="js/mylibs/data/statisticsrepository.js"></script>
+		<script src="js/mylibs/data/statisticsoverallrepository.js"></script>
 		<script src="js/mylibs/data/workoutrepository.js"></script>
 		
 		<script src="js/mylibs/eventhandlers/statistics-workout-created-event-handler.js"></script>
@@ -101,7 +99,11 @@
 						<li>Elapsed Time: <span data-bind="text: elapsedTime"></span></li>
 					</ul>
 					
-					<a href="#track-popup-map" data-rel="popup" data-role="button" data-transition="pop" data-theme="b" data-icon="info">Map</a>
+					<a href="#track-popup-map" data-rel="popup" data-role="button" data-transition="pop" data-theme="b" data-icon="info" data-bind="visible: hasConnection">Map</a>
+					<ul data-role="listview" data-inset="true" data-bind="visible: hasConnection() == false" data-theme="e">
+		        		<li data-icon="alert" data-iconpos="right"><a href="#">Must have a connection to view your route as a Google Map...</a></li>
+		        	</ul>
+					
 					<div data-role="popup" id="track-popup-map" data-overlay-theme="a" data-theme="a" data-corners="false" data-tolerance="15,15">
 					    <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>			 
 					    <div id="track-map-canvas" data-bind="visible: isTracking"></div>
@@ -165,7 +167,11 @@
 					<li>Elapsed Time: <span data-bind="text: elapsedTime"></span></li>
 				</ul>
 		    	
-		    	<a href="#track-info-popup-map" data-rel="popup" data-role="button" data-transition="pop" data-theme="b" data-icon="info">Map</a>
+		    	<a href="#track-info-popup-map" data-rel="popup" data-role="button" data-transition="pop" data-theme="b" data-icon="info" data-bind="visible: hasConnection">Map</a>
+		    	<ul data-role="listview" data-inset="true" data-bind="visible: hasConnection() == false" data-theme="e">
+		        	<li data-icon="alert" data-iconpos="right"><a href="#">Must have a connection to view your route as a Google Map...</a></li>
+		        </ul>
+		        	
 				<div data-role="popup" id="track-info-popup-map" data-overlay-theme="a" data-theme="a" data-corners="false" data-tolerance="15,15">
 					<a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
 					<div id="track-info-map-canvas" data-bind="visible: hasMap"></div>

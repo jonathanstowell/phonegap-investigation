@@ -12,6 +12,7 @@ var tracking_model = {};
 	index.name = ko.observable();
 	index.isTracking = ko.observable(false);
 	index.isWaitingForGPS = ko.observable(false);
+	index.hasConnection = ko.observable(false);
 	index.startDateTime = ko.observable();
 	index.elapsedTime = ko.observable();
 	index.endDateTime = ko.observable();
@@ -35,6 +36,7 @@ var tracking_model = {};
 		watch = navigator.geolocation.watchPosition(function(position) {
 			
 			index.isWaitingForGPS(false);
+			index.hasConnection(connection_helper.hasConnection());
 			
 			index.latitude(position.coords.latitude);
 			index.longitude(position.coords.longitude);
@@ -143,6 +145,14 @@ var tracking_model = {};
 		index.currentTrackingData.removeAll();
 		index.errors.removeAll();
 	};
+	
+	jQuery(document).bind('online', function(){
+		index.hasConnection(true);
+	});
+		
+	jQuery(document).bind('offline', function(){
+		index.hasConnection(false);
+	});
 	
 	jQuery(function(){
 		ko.applyBindings(index, jQuery("#tracking")[0]);

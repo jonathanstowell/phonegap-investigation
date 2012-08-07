@@ -5,7 +5,7 @@ statistics_clear_event_handler = {};
 	statistics_clear_event_handler = index;
 	
 	jQuery(document).bind('clear-all', function (event, workout) {
-		statistic_repository.drop();
+		statistic_overall_repository.drop();
 	});
 	
 } (statistics_clear_event_handler))

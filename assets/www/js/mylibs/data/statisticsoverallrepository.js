@@ -1,11 +1,11 @@
-var statistic_repository = {};
+var statistic_overall_repository = {};
 
 (function(index) {
 	
-	statistic_repository = index;
+	statistic_overall_repository = index;
 	
 	var db = function() {	
-		distance_mapping.map();
+		statistics_overall_mapping.map();
 		return db_access.get();
 	};
 	
@@ -80,4 +80,4 @@ var statistic_repository = {};
 		return db().rowCount("statistics");
 	};
 	
-} (statistic_repository))
+} (statistic_overall_repository))

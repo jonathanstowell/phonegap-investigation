@@ -1,8 +1,3 @@
-function onDeviceReady() {
-    console.log("We got device ready");
-    cordova.exec(null, null, "SplashScreen", "hide", []);
-}
-
 function gps_distance(lat1, lon1, lat2, lon2)
 {
 	// http://www.movable-type.co.uk/scripts/latlong.html

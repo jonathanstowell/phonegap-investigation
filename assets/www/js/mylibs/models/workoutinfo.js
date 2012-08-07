@@ -8,6 +8,7 @@ var track_info_model = {};
 	index.trackingData = ko.observableArray([]);
 	var map = null;
 	index.hasMap = ko.observable(false);
+	index.hasConnection = ko.observable(false);
 	index.distance = ko.observable();
 	index.startDateTime = ko.observable();
 	index.endDateTime = ko.observable();
@@ -64,6 +65,7 @@ var track_info_model = {};
 		index.distance(item.distance);
 		index.startDateTime(new Date(item.startDateTime));
 		index.endDateTime(new Date(item.endDateTime));
+		index.hasConnection(connection_helper.hasConnection());
 		
 		var size = fullScreen(0, 1),
         	w = size.width,
@@ -116,6 +118,14 @@ var track_info_model = {};
 		workout_repository.deleteItem(index.name());
 		jQuery.mobile.changePage("#history", "slide", false, false);
 	};
+	
+	jQuery(document).bind('online', function(){
+		index.hasConnection(true);
+	});
+		
+	jQuery(document).bind('offline', function(){
+		index.hasConnection(false);
+	});
 	
 	jQuery(function(){
 		ko.applyBindings(index, jQuery("#track-info")[0]);
