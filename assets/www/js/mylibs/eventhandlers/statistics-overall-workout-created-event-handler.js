@@ -1,8 +1,8 @@
-statistics_workout_created_event_handler = {};
+statistics_overall_workout_created_event_handler = {};
 
 (function(index) {
 	
-	statistics_workout_created_event_handler = index;
+	statistics_overall_workout_created_event_handler = index;
 	
 	jQuery(document).bind('workoutCreated', function (event, workout) {
 		var item = statistic_overall_repository.get();
@@ -18,4 +18,4 @@ statistics_workout_created_event_handler = {};
 		
 	});
 	
-} (statistics_workout_created_event_handler))
+} (statistics_overall_workout_created_event_handler))

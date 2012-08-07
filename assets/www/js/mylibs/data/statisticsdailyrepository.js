@@ -3,7 +3,7 @@ var statistic_daily_repository = {};
 (function(index) {
 	
 	statistic_daily_repository = index;
-	
+	 
 	var db = function() {	
 		statistics_daily_mapping.map();
 		return db_access.get();
@@ -13,7 +13,7 @@ var statistic_daily_repository = {};
 		if (index.exists(day, month, year) == false)
 			return null;
 		
-		return db().query("statisticsdaily", function(row) { if(row.day == day && row.month == month && row.year = year) { return true; } else { return false; } }, 1);
+		return db().query("statisticsdaily", function(row) { if(row.day == day && row.month == month && row.year == year) { return true; } else { return false; } }, 1)[0];
 	};
 	
 	index.todaysoverallworkouts = function() {
@@ -37,7 +37,7 @@ var statistic_daily_repository = {};
 	};
 	
 	index.exists = function(day, month, year) {
-		return db().query("statisticsdaily", function(row) { if(row.day == day && row.month == month && row.year = year) { return true; } else { return false; } }, 1) != null;
+		return db().query("statisticsdaily", function(row) { if(row.day == day && row.month == month && row.year == year) { return true; } else { return false; } }, 1)[0] != null;
 	};
 	
 	index.save = function(item) {	

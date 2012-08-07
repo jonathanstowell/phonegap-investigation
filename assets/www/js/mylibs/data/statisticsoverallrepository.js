@@ -13,7 +13,7 @@ var statistic_overall_repository = {};
 		if (index.exists() == false)
 			return null;
 		
-		return db().query("statistics")[0];
+		return db().query("statisticsoverall")[0];
 	};
 	
 	index.overallworkouts = function() {
@@ -40,44 +40,43 @@ var statistic_overall_repository = {};
 	
 	index.save = function(distance) {
 		if (index.exists() == false) {
-			distance.id = 1;
-			db().insert("statistics", distance);
+			db().insert("statisticsoverall", distance);
 			db().commit();
 		
 			jQuery(document).trigger('statisticCreated', [distance]);
 		}
 	};
 	
-	index.update = function(distance) {
+	index.update = function(item) {
 		if (index.exists()) {
-			db().update("statistics", function(row) { if(row.id == 1) { return true; } }, function(row) { row = distance; return row; });
+			db().update("statisticsoverall", function(row) { if(row.ID == item.ID) { return true; } }, function(row) { row = item; return row; });
 			db().commit();
 		
-			jQuery(document).trigger('statisticUpdated', [distance]);
+			jQuery(document).trigger('statisticUpdated', [item]);
 		}
 	}
 	
-	index.deleteItem = function(key) {
-		db().deleteRows("statistics", { id: 1 });
+	index.deleteItem = function(id) {
+		db().deleteRows("statisticsoverall", { id: id });
 		db().commit();
 		
 		jQuery(document).trigger('statisticDeleted');
 	};
 	
 	index.clear = function() {
-		db().deleteRows("statistics");
+		db().deleteRows("statisticsoverall");
 		db().commit();
 		
 		jQuery(document).trigger('statisticCleared');
 	};
 	
 	index.drop = function() {
-		db().dropTable("statistics");
+		db().dropTable("statisticsoverall");
 		db().commit();
 	};
 	
 	index.count = function() {
-		return db().rowCount("statistics");
+		return db().rowCount("statisticsoverall");
 	};
 	
 } (statistic_overall_repository))

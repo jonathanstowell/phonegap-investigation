@@ -18,14 +18,23 @@
 		
 		<script src="js/mylibs/data/databaseaccess.js"></script>
 		
+		<script src="js/mylibs/mappings/statisticsdailymapping.js"></script>
+		<script src="js/mylibs/mappings/statisticsmonthlymapping.js"></script>
+		<script src="js/mylibs/mappings/statisticsyearlymapping.js"></script>
 		<script src="js/mylibs/mappings/statisticsoverallmapping.js"></script>
 		<script src="js/mylibs/mappings/workoutmapping.js"></script>
 		
+		<script src="js/mylibs/data/statisticsdailyrepository.js"></script>
+		<script src="js/mylibs/data/statisticsmonthlyrepository.js"></script>
+		<script src="js/mylibs/data/statisticsyearlyrepository.js"></script>
 		<script src="js/mylibs/data/statisticsoverallrepository.js"></script>
 		<script src="js/mylibs/data/workoutrepository.js"></script>
 		
-		<script src="js/mylibs/eventhandlers/statistics-workout-created-event-handler.js"></script>
-		<script src="js/mylibs/eventhandlers/statistics-clear-event-handler.js"></script>
+		<script src="js/mylibs/eventhandlers/statistics-daily-workout-created-event-handler.js"></script>
+		<script src="js/mylibs/eventhandlers/statistics-monthly-workout-created-event-handler.js"></script>
+		<script src="js/mylibs/eventhandlers/statistics-yearly-workout-created-event-handler.js"></script>
+		<script src="js/mylibs/eventhandlers/statistics-overall-workout-created-event-handler.js"></script>
+		<script src="js/mylibs/eventhandlers/statistics-overall-clear-event-handler.js"></script>
 		<script src="js/mylibs/eventhandlers/workout-clear-event-handler.js"></script>
 		
 		<script src="js/mylibs/models/home.js"></script>
@@ -54,8 +63,27 @@
 		
 			<div data-role="content">
 				<ul data-role="listview" data-inset="true" >
-					<li>Total Rides: <span class="ui-li-count" data-bind="text: rideCount"></span></li>
-					<li>Total Kilometers Covered: <span class="ui-li-count" data-bind="text: distanceCount"></span></li>
+					<li data-role="list-divider" role="heading">Today</li>
+					<li>Total Rides: <span class="ui-li-count" data-bind="text: dailyRideCount"></span></li>
+					<li>Total Kilometers Covered: <span class="ui-li-count" data-bind="text: dailyDistanceCount"></span></li>
+				</ul>
+				
+				<ul data-role="listview" data-inset="true" >
+					<li data-role="list-divider" role="heading">This Month</li>
+					<li>Total Rides: <span class="ui-li-count" data-bind="text: monthlyRideCount"></span></li>
+					<li>Total Kilometers Covered: <span class="ui-li-count" data-bind="text: monthlyDistanceCount"></span></li>
+				</ul>
+				
+				<ul data-role="listview" data-inset="true" >
+					<li data-role="list-divider" role="heading">This Year</li>
+					<li>Total Rides: <span class="ui-li-count" data-bind="text: yearlyRideCount"></span></li>
+					<li>Total Kilometers Covered: <span class="ui-li-count" data-bind="text: yearlyDistanceCount"></span></li>
+				</ul>
+				
+				<ul data-role="listview" data-inset="true" >
+					<li data-role="list-divider" role="heading">Overall</li>
+					<li>Total Rides: <span class="ui-li-count" data-bind="text: overallRideCount"></span></li>
+					<li>Total Kilometers Covered: <span class="ui-li-count" data-bind="text: overallDistanceCount"></span></li>
 				</ul>
 			</div>	
 		</div>
@@ -138,8 +166,8 @@
 		        </ul>
 		        
 		        <div data-role="controlgroup">
-		        	<button data-iconpos="right" data-icon="arrow-r" data-bind="click: function(event) { page('next'); }">Next</button>
-					<button data-iconpos="left" data-icon="arrow-l" data-bind="click: function(event) { page('prev'); }">Previous</button>
+		        	<button id="history-next" data-iconpos="right" data-icon="arrow-r" data-bind="click: function(event) { page('next'); }">Next</button>
+					<button id="history-prev" data-iconpos="left" data-icon="arrow-l" data-bind="click: function(event) { page('prev'); }">Previous</button>
 				</div>
 		    </div>
 		</div>

@@ -18,6 +18,10 @@ function gps_distance(lat1, lon1, lat2, lon2)
 function timer() {
 	this.getElapsedTime = function(startdate) {
 		var timeend = new Date();
+		
+		if (startdate == '')
+			return;
+		
 		var diff = timeend.getTime() - startdate.getTime();
 		
 		timeend.setTime(diff);

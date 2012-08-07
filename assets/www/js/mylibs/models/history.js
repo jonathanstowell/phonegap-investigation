@@ -4,7 +4,8 @@ var history_model = {};
 	
 	history_model = index;
 	
-	var page = 1;
+	index.pageNumber = ko.observable(1);
+	
 	index.tracks = ko.observableArray([]);
 	index.tracksCount = ko.observable();
 	
@@ -12,22 +13,36 @@ var history_model = {};
 		jQuery(document).trigger('rideDetails', [obj.name])
 	};
 	
+	index.shouldDisableButtons = ko.computed(function() {
+		if (index.pageNumber() <= 1) {
+			jQuery('#history-prev').button('disable');
+		} else {
+			jQuery('#history-prev').button('enable');
+		}
+		
+		if (index.pageNumber() > (index.tracksCount() / 10)) {
+			jQuery('#history-next').button('disable');
+		} else {
+			jQuery('#history-next').button('enable');
+		}
+	});
+	
 	index.page = function(type) {
-		var original = page;
+		var original = index.pageNumber();
 		
 		if (type == "next")
-			page = page + 1;
+			index.pageNumber(index.pageNumber() + 1);
 		else
-			page = page - 1;
+			index.pageNumber(index.pageNumber() - 1);
 		
-		if (page < 1 || page - 1 > (index.tracksCount() / 10)) {
-			page = original;
+		if (index.pageNumber() < 1 || index.pageNumber() - 1 > (index.tracksCount() / 10)) {
+			index.pageNumber(original);
 			return;
 		}
 		
 		index.tracks.removeAll();
 		
-		var items = workout_repository.getPaged(page, 10);
+		var items = workout_repository.getPaged(index.pageNumber(), 10);
 		
 		for(i=0; i < items.length; i++){
 			index.tracks.push(items[i]);
@@ -39,7 +54,7 @@ var history_model = {};
 	jQuery('#history').live('pageshow', function () {
 		index.tracks.removeAll();
 		
-		var items = workout_repository.getPaged(page, 10);
+		var items = workout_repository.getPaged(index.pageNumber(), 10);
 		index.tracksCount(workout_repository.count());
 		
 		for(i=0; i < items.length; i++){

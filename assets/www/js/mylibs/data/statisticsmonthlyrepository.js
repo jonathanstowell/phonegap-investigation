@@ -13,7 +13,7 @@ var statistic_monthly_repository = {};
 		if (index.exists(month, year) == false)
 			return null;
 		
-		return db().query("statisticsmonthly", function(row) { if(row.month == month && row.year = year) { return true; } else { return false; } }, 1);
+		return db().query("statisticsmonthly", function(row) { if(row.month == month && row.year == year) { return true; } else { return false; } }, 1)[0];
 	};
 	
 	index.currentmonthsoverallworkouts = function() {
@@ -37,11 +37,11 @@ var statistic_monthly_repository = {};
 	};
 	
 	index.exists = function(month, year) {
-		return db().query("statisticsmonthly", function(row) { if(row.month == month && row.year = year) { return true; } else { return false; } }, 1) != null;
+		return db().query("statisticsmonthly", function(row) { if(row.month == month && row.year == year) { return true; } else { return false; } }, 1)[0] != null;
 	};
 	
 	index.save = function(item) {
-		if (index.exists() == false) {
+		if (index.exists(item.month, item.year) == false) {
 
 			db().insert("statisticsmonthly", item);
 			db().commit();
@@ -51,8 +51,8 @@ var statistic_monthly_repository = {};
 	};
 	
 	index.update = function(item) {
-		if (index.exists()) {
-			db().update("statisticsmonthly", function(row) { if(row.id == 1) { return true; } }, function(row) { row = item; return row; });
+		if (index.exists(item.month, item.year)) {
+			db().update("statisticsmonthly", function(row) { if(row.ID == item.ID) { return true; } }, function(row) { row = item; return row; });
 			db().commit();
 		
 			jQuery(document).trigger('monthlyStatisticUpdated', [item]);
