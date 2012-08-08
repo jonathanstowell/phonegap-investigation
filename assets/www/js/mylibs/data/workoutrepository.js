@@ -60,4 +60,27 @@ var workout_repository = {};
 		return db().rowCount("workouts");
 	};
 	
+	index.validate = function(item) {
+		var errors = new Array();
+		
+		if (!item.name) {
+			errors.push({ value: "Name is required." });
+		}
+		
+		if (item.name && workout_repository.exists(item.name)) {
+			errors.push({ value: "Name must be unique." });
+		}
+		
+		if (item.distance <= 0) {
+			errors.push({ value: "A workout must be longer than 0km." });
+		}
+		
+		if (errors.length > 0) {
+			errors.unshift({ value: "We were not able to save your workout." });
+			return { result: false, errors: errors };
+		}
+			
+		return { result: true, errors: errors };
+	};
+	
 } (workout_repository))

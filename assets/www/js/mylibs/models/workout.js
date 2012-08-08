@@ -6,7 +6,7 @@ var tracking_model = {};
 	
 	var timerProcessIdentifier = null;
 	var watch = null;
-	var map = null;
+	var maphelper = new GoogleMapsHelper();
 	
 	index.name = ko.observable();
 	index.isTracking = ko.observable(false);
@@ -42,53 +42,34 @@ var tracking_model = {};
 			
 			if (index.currentTrackingData().length == 0) {
 				timerProcessIdentifier = setInterval('tracking_model.timer()', 1000);
-				console.log("Start Timer Process ID:" + timerProcessIdentifier);
 			}
 			
 			index.currentTrackingData.push(position);
 			
-			var size = screen_helper.fullScreen(0, 1),
-	    		w = size.width,
-	    		h = size.height;
-	
-			jQuery("#track-map-canvas").css({ "width": w, "height" : h });
+			maphelper.produceMapFromCoords("#track-map-canvas", index.currentTrackingData());
 			
-			var pos = new google.maps.LatLng(index.latitude(), index.longitude());
-			
-			if (map == null)
-				map = new google.maps.Map(jQuery("#track-map-canvas")[0], { zoom: 15, center: pos, mapTypeId: google.maps.MapTypeId.ROADMAP });
-			else
-				map.setCenter(pos);
-			
-			var trackCoords = [];
-
-		    for(i=0; i < index.currentTrackingData().length; i++){
-		    	trackCoords.push(new google.maps.LatLng(index.currentTrackingData()[i].coords.latitude, index.currentTrackingData()[i].coords.longitude));
-		    }
-		    
-		    var trackPath = new google.maps.Polyline({
-		      path: trackCoords,
-		      strokeColor: "#FF0000",
-		      strokeOpacity: 1.0,
-		      strokeWeight: 2
-		    });
-
-		    trackPath.setMap(map);
-		    setTimeout(function() { google.maps.event.trigger(map,'resize'); map.setCenter(pos); }, 500);
-		    
-			}, function(error) {
-				console.log(error);
-			}, 
-			{ timeout: 1500, enableHighAccuracy: true });	
+		}, function(error) {
+			console.log(error);
+		}, 
+		{ timeout: 1500, enableHighAccuracy: true });	
 	};
 	
 	index.stopTracking = function() {
 		index.isTracking(false);
 		index.isWaitingForGPS(false);
 		index.endDateTime(new Date());
-		workout_repository.save({ name: index.name(), trackingData: index.currentTrackingData(), startDateTime: index.startDateTime(), endDateTime: index.endDateTime(), distance: index.distance() });	
-		jQuery(document).trigger('rideDetails', [index.name()]);
-		index.clear();
+		
+		var toSave = index.toJS();
+		var result = workout_repository.validate(toSave);
+		
+		if (result.result == true) {
+			workout_repository.save({ name: index.name(), trackingData: index.currentTrackingData(), startDateTime: index.startDateTime(), endDateTime: index.endDateTime(), distance: index.distance() });	
+			jQuery(document).trigger('rideDetails', [index.name()]);
+		} else {
+			for (var i = 0; i < result.errors.length; i++) {
+				index.errors.push(result.errors[i]);
+			}
+		}
 	};
 	
 	index.distance = ko.computed(function(){
@@ -135,6 +116,11 @@ var tracking_model = {};
 		index.endDateTime("");
 		index.currentTrackingData.removeAll();
 		index.errors.removeAll();
+		maphelper.clear();
+	};
+	
+	index.toJS = function(){
+		return { name: index.name(), trackingData: index.currentTrackingData(), startDateTime: index.startDateTime(), endDateTime: index.endDateTime(), distance: index.distance() };
 	};
 	
 	jQuery(document).bind('online', function(){

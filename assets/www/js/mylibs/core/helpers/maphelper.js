@@ -37,3 +37,44 @@ var map_helper = {};
 	};
 	
 } (map_helper))
+
+function GoogleMapsHelper() {
+	
+	var map = null;
+	
+	this.produceMapFromCoords = function(selector, currentTrackingData) {
+		var size = screen_helper.fullScreen(0, 1),
+			w = size.width,
+			h = size.height;
+
+		jQuery(selector).css({ "width": w, "height" : h });
+	
+		var pos = new google.maps.LatLng(currentTrackingData[currentTrackingData.length - 1].coords.latitude, currentTrackingData[currentTrackingData.length - 1].coords.longitude);
+		
+		if (map == null)
+			map = new google.maps.Map(jQuery(selector)[0], { zoom: 15, center: pos, mapTypeId: google.maps.MapTypeId.ROADMAP });
+		else
+			map.setCenter(pos);
+		
+		var trackCoords = [];
+
+	    for(i=0; i < currentTrackingData.length; i++){
+	    	trackCoords.push(new google.maps.LatLng(currentTrackingData[i].coords.latitude, currentTrackingData[i].coords.longitude));
+	    }
+	    
+	    var trackPath = new google.maps.Polyline({
+	      path: trackCoords,
+	      strokeColor: "#FF0000",
+	      strokeOpacity: 1.0,
+	      strokeWeight: 2
+	    });
+
+	    trackPath.setMap(map);
+	    
+	    setTimeout(function() { google.maps.event.trigger(map,'resize'); map.setCenter(pos); }, 500);
+	};
+	
+	this.clear = function() {
+		map = null;
+	};
+}

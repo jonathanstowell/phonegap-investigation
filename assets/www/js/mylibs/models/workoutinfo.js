@@ -6,7 +6,7 @@ var track_info_model = {};
 	
 	index.name = ko.observable();
 	index.trackingData = ko.observableArray([]);
-	var map = null;
+	var maphelper = new GoogleMapsHelper();
 	index.hasMap = ko.observable(false);
 	index.hasConnection = ko.observable(false);
 	index.distance = ko.observable();
@@ -42,37 +42,12 @@ var track_info_model = {};
 		index.endDateTime(new Date(item.endDateTime));
 		index.hasConnection(connection_helper.hasConnection());
 		
-		var size = screen_helper.fullScreen(0, 1),
-        	w = size.width,
-        	h = size.height;
-	 
-	    jQuery("#track-info-map-canvas").css({ "width": w, "height" : h });
-		
 		if (item.trackingData[0] != null) {
-			console.log("Coords" + item.trackingData[0].coords.latitude + " " + item.trackingData[0].coords.longitude)
-			
-			var pos = new google.maps.LatLng(item.trackingData[0].coords.latitude, item.trackingData[0].coords.longitude);
-			map = new google.maps.Map(jQuery("#track-info-map-canvas")[0], { zoom: 15, center: pos, mapTypeId: google.maps.MapTypeId.ROADMAP });
-			
-			var trackCoords = [];
-			
-			console.log("length = " + item.trackingData.length);
-			
 		    for(i=0; i < item.trackingData.length; i++){
 		    	index.trackingData.push(item.trackingData[i]);
-		    	trackCoords.push(new google.maps.LatLng(item.trackingData[i].coords.latitude, item.trackingData[i].coords.longitude));
-		    	console.log(i + " Coords " + item.trackingData[i].coords.latitude + " " + item.trackingData[i].coords.longitude)
 		    }
-		    
-		    var trackPath = new google.maps.Polyline({
-		      path: trackCoords,
-		      strokeColor: "#FF0000",
-		      strokeOpacity: 1.0,
-		      strokeWeight: 2
-		    });
-	
-		    trackPath.setMap(map);
-		    setTimeout(function() { google.maps.event.trigger(map,'resize'); map.setCenter(pos); }, 500);
+
+			maphelper.produceMapFromCoords("#track-info-map-canvas", index.trackingData());
 		    index.hasMap(true);
 		}
 		
@@ -83,6 +58,7 @@ var track_info_model = {};
 		index.name("");
 		index.hasMap(false);
 		index.trackingData.removeAll();
+		maphelper.clear();
 	};
 	
 	index.deleteItem = function() {
