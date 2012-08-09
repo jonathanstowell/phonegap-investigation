@@ -12,6 +12,7 @@ var track_info_model = {};
 	index.distance = ko.observable();
 	index.startDateTime = ko.observable();
 	index.endDateTime = ko.observable();
+	index.imagePath = ko.observable();
 	
 	index.startDateTimeDisplay = ko.computed(function() {
 		if (typeof index.startDateTime() != 'undefined')
@@ -47,12 +48,28 @@ var track_info_model = {};
 		    	index.trackingData.push(item.trackingData[i]);
 		    }
 
-			maphelper.produceMapFromCoords("#track-info-map-canvas", index.trackingData());
+			maphelper.produceMapFromCoords("#track-info-map-canvas", index.trackingData(), true, index.viewPicture);
 		    index.hasMap(true);
 		}
 		
 		jQuery.mobile.changePage("#track-info", "slide", false, false);
     });
+	
+	index.viewPicture = function(position) {
+		var size = screen_helper.fullScreen(0, 1),
+			w = size.width,
+			h = size.height;
+
+		jQuery("#track-info-picture").css({ "width": w, "height" : h });
+		
+		index.imagePath(position.imageURI);
+	
+		index.hasMap(false);
+	};
+	
+	index.returnToMap = function() {
+		index.hasMap(true);
+	};
 	
 	index.clear = function() {
 		index.name("");

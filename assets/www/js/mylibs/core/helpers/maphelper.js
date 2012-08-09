@@ -42,7 +42,7 @@ function GoogleMapsHelper() {
 	
 	var map = null;
 	
-	this.produceMapFromCoords = function(selector, currentTrackingData) {
+	this.produceMapFromCoords = function(selector, currentTrackingData, useAnimation, pictureCallback) {
 		var size = screen_helper.fullScreen(0, 1),
 			w = size.width,
 			h = size.height;
@@ -59,7 +59,29 @@ function GoogleMapsHelper() {
 		var trackCoords = [];
 
 	    for(i=0; i < currentTrackingData.length; i++){
-	    	trackCoords.push(new google.maps.LatLng(currentTrackingData[i].coords.latitude, currentTrackingData[i].coords.longitude));
+	    	var latLng = new google.maps.LatLng(currentTrackingData[i].coords.latitude, currentTrackingData[i].coords.longitude);
+	    	
+	    	trackCoords.push(latLng);
+	    	
+	    	console.log(currentTrackingData[i].imageURI);
+	    	if (typeof currentTrackingData[i].imageURI != 'undefined') {
+	    		console.log(currentTrackingData[i].imageURI);
+	    		
+	    		var animation = useAnimation ? google.maps.Animation.DROP : null;
+	    		
+		    	var marker = new google.maps.Marker({
+		            position: latLng,
+		            map: map,
+		            animation: google.maps.Animation.DROP,
+		        });
+		    	
+		    	var infoWindow = new google.maps.InfoWindow();
+		    	
+		    	google.maps.event.addListener(marker, 'click', function() {
+		    	    map.setCenter(marker.getPosition());
+		    	    pictureCallback(marker.position);
+		    	});
+	    	}
 	    }
 	    
 	    var trackPath = new google.maps.Polyline({

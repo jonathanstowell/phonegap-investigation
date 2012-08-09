@@ -7,6 +7,7 @@
 		
 		<script src="js/libs/jquery.js"></script>
 		<script src="js/libs/jquery.mobile.js"></script>
+		<script src="js/libs/cordova.js"></script>
 		<script src="js/libs/knockout.js"></script>
 		<script src="js/libs/date.format.js"></script>
 		<script src="js/libs/localstoragedb.js"></script>
@@ -147,12 +148,15 @@
 		        	</ul>
 					
 					<div data-role="popup" id="track-popup-map" data-overlay-theme="a" data-theme="a" data-corners="false" data-tolerance="15,15">
-					    <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>			 
-					    <div id="track-map-canvas" data-bind="visible: isTracking"></div>
+					    <a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right" data-bind="visible: showMap">Close</a>
+					    <a href="#" data-role="button" data-theme="a" data-icon="back" data-iconpos="notext" class="ui-btn-right" data-bind="click: returnToMap, visible: showMap() == false">Return</a>				 
+					    <div id="track-map-canvas" data-bind="visible: isTracking() == true && showMap() == true"></div>
+					    <img id="track-picture" data-bind="visible: showMap() == false, attr: { src: imagePath }" />
 					</div>
 				</div>
 				
-				<div data-role="button" data-bind="click: stopTracking, visible: isTracking" data-icon="delete">Stop Tracking</div>	
+				<div data-role="button" data-bind="click: takePhoto, visible: isTracking() == true && isWaitingForGPS() == false" data-theme="b" data-icon="star">Capture Photo</div>	
+				<div data-role="button" data-bind="click: stopTracking, visible: isTracking" data-icon="delete">Stop Tracking</div>
 			</div>
 		</div>
 		
@@ -215,8 +219,10 @@
 		        </ul>
 		        	
 				<div data-role="popup" id="track-info-popup-map" data-overlay-theme="a" data-theme="a" data-corners="false" data-tolerance="15,15">
-					<a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right">Close</a>
+					<a href="#" data-rel="back" data-role="button" data-theme="a" data-icon="delete" data-iconpos="notext" class="ui-btn-right" data-bind="visible: hasMap">Close</a>
+					<a href="#" data-role="button" data-theme="a" data-icon="back" data-iconpos="notext" class="ui-btn-right" data-bind="click: returnToMap, visible: hasMap() == false">Return</a>
 					<div id="track-info-map-canvas" data-bind="visible: hasMap"></div>
+					<img id="track-info-picture" data-bind="visible: hasMap() == false, attr: { src: imagePath }" />
 				</div>
 					
 		        <div data-role="button" data-bind="click: deleteItem" data-icon="delete">Delete</div>
@@ -241,18 +247,6 @@
 			</div>
 		
 			<div data-role="content">
-				<label for="settings-sync"><h3>Sync Workouts:</h3></label>
-				<select name="settings-sync" id="settings-sync" data-role="slider">
-					<option value="off">Off</option>
-					<option value="on">On</option>
-				</select>
-				
-				<label for="settings-sync-pictures"><h3>Sync Pictures:</h3></label>
-				<select name="settings-sync-pictures" id="settings-sync-pictures" data-role="slider">
-					<option value="off">Off</option>
-					<option value="on">On</option>
-				</select>
-				
 				<label><h3>Misc:</h3></label>
 				<div data-role="button" data-bind="click: clear">Clear Workouts</div>
 			</div>	

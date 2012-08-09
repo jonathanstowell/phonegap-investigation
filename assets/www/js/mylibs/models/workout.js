@@ -7,6 +7,7 @@ var tracking_model = {};
 	var timerProcessIdentifier = null;
 	var watch = null;
 	var maphelper = new GoogleMapsHelper();
+	var lastPosition = null;
 	
 	index.name = ko.observable();
 	index.isTracking = ko.observable(false);
@@ -18,6 +19,8 @@ var tracking_model = {};
 	index.latitude = ko.observable();
 	index.longitude = ko.observable();
 	index.errors = ko.observableArray([]);
+	index.showMap = ko.observable(false);
+	index.imagePath = ko.observable();
 	
 	index.currentTrackingData = ko.observableArray([]);
 	
@@ -32,26 +35,29 @@ var tracking_model = {};
 		
 		index.startDateTime(new Date());
 		
-		watch = navigator.geolocation.watchPosition(function(position) {
-			
-			index.isWaitingForGPS(false);
-			index.hasConnection(connection_helper.hasConnection());
-			
-			index.latitude(position.coords.latitude);
-			index.longitude(position.coords.longitude);
-			
-			if (index.currentTrackingData().length == 0) {
-				timerProcessIdentifier = setInterval('tracking_model.timer()', 1000);
-			}
-			
-			index.currentTrackingData.push(position);
-			
-			maphelper.produceMapFromCoords("#track-map-canvas", index.currentTrackingData());
-			
+		watch = navigator.geolocation.watchPosition(function(position) {		
+			if (lastPosition == null || (position.coords.latitude != lastPosition.coords.latitude || position.coords.longitude != lastPosition.coords.longitude)) {
+				index.isWaitingForGPS(false);
+				index.hasConnection(connection_helper.hasConnection());
+				
+				index.latitude(position.coords.latitude);
+				index.longitude(position.coords.longitude);
+				
+				if (index.currentTrackingData().length == 0) {
+					timerProcessIdentifier = setInterval('tracking_model.timer()', 1000);
+				}
+					
+				index.currentTrackingData.push(position);
+				
+				maphelper.produceMapFromCoords("#track-map-canvas", index.currentTrackingData(), true, index.viewPicture);
+				index.showMap(true);
+				
+				lastPosition = position;
+			}		
 		}, function(error) {
 			console.log(error);
 		}, 
-		{ timeout: 1500, enableHighAccuracy: true });	
+		{ timeout: 1000, enableHighAccuracy: true });	
 	};
 	
 	index.stopTracking = function() {
@@ -69,7 +75,46 @@ var tracking_model = {};
 			for (var i = 0; i < result.errors.length; i++) {
 				index.errors.push(result.errors[i]);
 			}
+			
+			jQuery("#track-errors-container").listview('refresh');
 		}
+	};
+	
+	index.takePhoto = function() {
+		navigator.camera.getPicture(function(imageURI) {
+			
+			navigator.geolocation.getCurrentPosition(function(position) {
+				index.latitude(position.coords.latitude);
+				index.longitude(position.coords.longitude);
+				
+				position.imageURI = imageURI;
+				
+				index.currentTrackingData.push(position);
+				
+				console.log(position.imageURI);
+			}, function(error) {
+				console.log(error);
+			});	
+		}, function(error) {
+			console.log(error);
+		}, 
+		{ quality: 50, destinationType: navigator.camera.DestinationType.FILE_URI });
+	};
+	
+	index.viewPicture = function(position) {
+		var size = screen_helper.fullScreen(0, 1),
+			w = size.width,
+			h = size.height;
+
+		jQuery("#track-picture").css({ "width": w, "height" : h });
+		
+		index.imagePath(position.imageURI);
+	
+		index.showMap(false);
+	};
+	
+	index.returnToMap = function() {
+		index.showMap(true);
 	};
 	
 	index.distance = ko.computed(function(){
@@ -131,7 +176,7 @@ var tracking_model = {};
 		index.hasConnection(false);
 	});
 	
-	jQuery(function(){
+	jQuery(function(){		
 		ko.applyBindings(index, jQuery("#tracking")[0]);
 	});
 	
