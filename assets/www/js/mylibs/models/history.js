@@ -52,6 +52,8 @@ var history_model = {};
 	};
 	
 	jQuery('#history').live('pageshow', function () {
+		jQuery.mobile.loading('show');
+		
 		index.tracks.removeAll();
 		
 		var items = workout_repository.getPaged(index.pageNumber(), 10);
@@ -62,6 +64,8 @@ var history_model = {};
 		}
 		
 		jQuery("#history-tracklist").listview('refresh');
+		
+		jQuery.mobile.loading('hide');
 	});
 	
 	jQuery(function(){
